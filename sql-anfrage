@@ -1,0 +1,172 @@
+
+6a.
+CREATE VIEW dbp057.avgRatedMovies AS
+SELECT movies.MOVIEID, movies.TITLE, movies.YEAR, ratings.RANK
+FROM movies, ratings
+WHERE movies.MOVIEID = ratings.MOVIEID AND ratings.rank > (SELECT avg(rank) FROM ratings);
+
+6b.
+CREATE VIEW dbp057.waltDisneyMovies AS
+SELECT movies.MOVIEID, TITLE, GENRE
+FROM movies, movies2directors
+WHERE movies.MOVIEID = movies2directors.MOVIEID AND directorID = (SELECT directorid FROM directors WHERE name = 'Disney, Walt');
+
+
+
+7a.
+SELECT avg(c) as amount
+FROM (
+SELECT count(m.actorid) as c
+FROM dbmaster.movies2actors as m
+INNER JOIN dbmaster.genres as g
+ON m.movieid = g.movieid
+WHERE genre = 'Horror'
+GROUP BY m.movieid
+);
+7b.
+SELECT TITLE, COUNT(GENRE) as amount
+FROM dbp057.waltDisneyMovies
+GROUP BY TITLE
+HAVING count(genre) <= 2;
+
+
+8a.
+SELECT avg(c) as amount
+FROM (
+SELECT count(m.actorid) as c
+FROM dbmaster.movies2actors as m
+INNER JOIN dbmaster.genres as g
+ON m.movieid = g.movieid
+WHERE genre = 'Horror'
+GROUP BY m.movieid
+);
+
+8b.
+SELECT name, gross/c as mean_gross FROM
+(
+SELECT directorid as id, count(movieid) as c
+FROM dbmaster.movies2directors
+GROUP BY directorid
+) INNER JOIN dbmaster.directors
+ON directorid = id
+ORDER BY (gross/c) DESC;
+
+
+8c.
+SELECT title, amount
+FROM dbmaster.movies
+INNER JOIN (
+SELECT movieid as id, count(actorid) as amount
+FROM dbmaster.movies2actors
+GROUP BY movieid
+HAVING count(actorid) = (SELECT MAX(mycount) FROM (SELECT movieid, count(actorid) as mycount from dbmaster.movies2actors GROUP BY movieid))
+)
+ON movieid = id;
+
+
+8d.
+SELECT dname as name
+FROm(
+SELECT md.movieid as id, name as dname
+FROM dbmaster.movies2directors md
+INNER JOIN dbmaster.directors d
+ON md.directorid = d.directorid
+) INNER JOIN (
+SELECT ma.movieid as mid, name as aname
+FROM dbmaster.movies2actors ma
+INNER JOIN dbmaster.actors a
+ON ma.actorid = a.actorid
+) ON mid = id
+WHERE dname = aname;
+
+8e.
+SELECT writerid
+FROM dbmaster.movies2writers mw
+INNER JOIN dbmaster.movies m
+ON m.movieid = mw.movieid
+WHERE year = ALL (SELECT year FROM dbmaster.movies where year between 1920 AND 1929);
+
+
+
+8f.
+SELECT genre, count(movieid) as movies_per_genre, (count(movieid)*100.0/(Select Count(distinct movieid) from dbmaster.genres where genre is not null)) as market_share
+FROM dbmaster.genres
+WHERE genre IS NOT NULL
+GROUP BY genre;
+
+8g.
+
+SELECT genre, count(movieid) as movies_per_genre, (count(movieid)*100.0/(Select Count(distinct movieid) from dbmaster.genres where genre is not null)) as market_share
+FROM dbmaster.genres
+WHERE genre IS NOT NULL
+GROUP BY genre;
+
+trigger_block2
+CREATE TRIGGER trigger1 
+AFTER UPDATE on dbmaster.ratings
+REFERENCING NEW AS neu
+FOR EACH ROW MODE DB2SQL
+BEGIN ATOMIC
+	IF neu.votes = 100 THEN
+		INSERT INTO dbp057.frequentratedmovies(movieid, title, year)
+		SELECT movieid as id, title, year FROM dbmaster.movies where id = neu.movieid;
+	END IF;
+END@
+ 
+ CREATE TRIGGER trigger2
+AFTER UPDATE on dbmaster.ratings
+REFERENCING NEW AS neu
+FOR EACH ROW MODE DB2SQL
+BEGIN ATOMIC
+	IF neu.votes < 100 THEN
+		DELETE FROM frequentratedmovies WHERE movieid = neu.movieid;
+	END IF;
+END@
+
+
+CREATE TRIGGER trigger2
+AFTER UPDATE on dbmaster.ratings
+REFERENCING NEW AS neu
+FOR EACH ROW MODE DB2SQL
+BEGIN ATOMIC
+	IF neu.votes < 100 THEN
+		DELETE FROM frequentratedmovies WHERE movieid = neu.movieid;
+	END IF;
+END@
+
+
+CREATE TRIGGER trigger2
+AFTER UPDATE on dbmaster.ratings
+REFERENCING NEW AS neu
+FOR EACH ROW MODE DB2SQL
+BEGIN ATOMIC
+	IF neu.votes < 100 THEN
+		DELETE FROM frequentratedmovies WHERE movieid = neu.movieid;
+	END IF;
+END@
+
+
+CREATE TRIGGER trigger2
+AFTER UPDATE on dbmaster.ratings
+REFERENCING NEW AS neu
+FOR EACH ROW MODE DB2SQL
+BEGIN ATOMIC
+	IF neu.votes < 100 THEN
+		DELETE FROM frequentratedmovies WHERE movieid = neu.movieid;
+	END IF;
+END@
+
+trigger2....
+CREATE TRIGGER trigger2
+AFTER UPDATE on dbmaster.ratings
+REFERENCING NEW AS neu
+FOR EACH ROW MODE DB2SQL
+BEGIN ATOMIC
+	IF neu.votes < 100 THEN
+		DELETE FROM frequentratedmovies WHERE movieid = neu.movieid;
+	END IF;
+END@
+
+
+
+
