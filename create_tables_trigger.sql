@@ -1,9 +1,4 @@
--- Datenbanken Praktikum WS 2018/19
--- Musterlösung - Create Table-Statements
--- Importieren mit: 
--- db2 create database project
--- db2 connect to project
--- db2 -vtf create_tables_trigger.sql
+
 
 CREATE TABLE Benutzer (
   	benutzername VARCHAR(20) NOT NULL,
